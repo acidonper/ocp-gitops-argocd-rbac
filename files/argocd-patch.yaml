@@ -1,0 +1,12 @@
+spec: 
+  rbac:
+    defaultPolicy: ''
+    policy: |
+      p, role:operator, applications, get, */*, allow
+      p, role:operator, applications, sync, */*, allow
+
+      g, argo-admins, role:admin 
+      g, argo-readers, role:readonly
+      g, argo-operators, role:operator
+      g, argo-dev-operators, role:operator-dev
+    scopes: '[groups]'

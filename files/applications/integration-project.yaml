@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: integration
+  namespace: openshift-gitops
+spec:
+  namespaceResourceWhitelist:
+  - group: 'apps'
+    kind: Deployment
+  - group: ''
+    kind: Service
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    - namespace: '*'
+      server: '*'
+  sourceRepos:
+    - '*'

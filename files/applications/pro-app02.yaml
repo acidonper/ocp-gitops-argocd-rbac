@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: openshift-gitops
+  name: app02-pro
+spec:
+  destination:
+    name: ''
+    namespace: pro
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: .
+    repoURL: 'https://github.com/acidonper/jump-app-gitops.git'
+    targetRevision: 'feature/jump-app-dev'
+    helm:
+      valueFiles:
+        - values-quay.yaml
+  project: pro
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false 

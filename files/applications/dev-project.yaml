@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: dev
+  namespace: openshift-gitops
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    - namespace: 'dev'
+      server: '*'
+  sourceRepos:
+    - '*'
+  roles:
+  - name: argo-operators-dev
+    description: Read and Sync permissions for operators
+    policies:
+      - p, role:operator-dev, applications, get, dev/*, allow
+      - p, role:operator-dev, applications, sync, dev/*, allow
+    groups:
+    - argo-operators-dev
