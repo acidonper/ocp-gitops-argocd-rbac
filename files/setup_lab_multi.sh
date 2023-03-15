@@ -92,6 +92,7 @@ oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
 # Install GitOps Operator
 ##
 oc apply -f ./files/redhat_gitops.yaml
+sleep 60
 
 ## 
 # Create projects
@@ -104,7 +105,8 @@ oc label namespace pro argocd.argoproj.io/managed-by=openshift-gitops
 ## 
 # Create projects and applications
 ##
-oc apply -f files/applications/dev-app01.yaml
-oc apply -f files/applications/pro-app02.yaml
 oc apply -f files/applications/dev-project.yaml
 oc apply -f files/applications/pro-project.yaml
+sleep 10
+oc apply -f files/applications/dev-app01.yaml
+oc apply -f files/applications/pro-app02.yaml

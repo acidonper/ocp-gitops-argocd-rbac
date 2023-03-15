@@ -26,5 +26,4 @@ spec:
     description: Sync permissions for operators
     policies:
       - p, proj:integration:argo-integration, applications, sync, integration/*, allow
-    groups:
-    - argo-integration  
+      - p, proj:integration:argo-integration, applications, get, integration/*, allow

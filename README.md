@@ -84,6 +84,9 @@ Please execute the next procedure in order to review this functionality:
 ```$bash
 $ oc new-project test
 
+$ oc get role
+No resources found in test namespace.
+
 $ oc label namespace test argocd.argoproj.io/managed-by=openshift-gitops
 
 $ oc get role
@@ -153,23 +156,17 @@ $ argocd login openshift-gitops-server-openshift-gitops.apps.acidonpe34.sandbox7
 
 $ argocd proj role create-token integration argo-integration
 ...
-  Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmdvY2QiLCJzdWIiOiJwcm9qOmludGVncmF0aW9uOmFyZ28taW50ZWdyYXRpb24iLCJuYmYiOjE2Nzg4ODM4NTYsImlhdCI6MTY3ODg4Mzg1NiwianRpIjoiNTRjMTZmODYtYzA4ZS00NDg1LTk3YWYtZDQ0NjI4OWQwMWM3In0.oMC_HrzSSTCEO4bMEAusfPu9kvNkSa_HY_S1E_gMJAg
+  ID: de96dc6a-ac35-4a9a-bf2c-93b1e5efc6dc
+  Issued At: 2023-03-15T15:08:12+01:00
+  Expires At: Never
+  Token: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+$ JWT="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
 > **NOTE**
 >
 > JWT tokens aren't stored in Argo CD, they can only be retrieved when they are created
-
-- Obtain the respective *iat* from the JWT
-
-```$bash
-$ JWT="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmdvY2QiLCJzdWIiOiJwcm9qOmludGVncmF0aW9uOmFyZ28taW50ZWdyYXRpb24iLCJuYmYiOjE2Nzg4ODM4NTYsImlhdCI6MTY3ODg4Mzg1NiwianRpIjoiNTRjMTZmODYtYzA4ZS00NDg1LTk3YWYtZDQ0NjI4OWQwMWM3In0.oMC_HrzSSTCEO4bMEAusfPu9kvNkSa_HY_S1E_gMJAg"
-
-$ echo $JWT | sed 's/\./\n/g' <<< $(cut -d. -f1,2 <<< $1) | base64 --decode | jq
-...
-  "iat": 1678883856,
-...
-```
 
 - Test the current permissions of this JWT 
 
@@ -179,15 +176,63 @@ $ argocd app sync app03-integration --auth-token $JWT
 FATA[0001] rpc error: code = PermissionDenied desc = permission denied: applications, get, integration/app03-integration, sub: proj:integration:argo-integration, iat: 2023-03-15T12:37:36Z
 ```
 
+- Modify the project file to add the required permissions
+
+```$bash
+$ oc apply -f files/applications/integration-project-jwt.yaml
+```
+
+- Test the current permissions for the role that is linked to the respective JWT generated
+
+```$bash
+$ argocd app sync app03-integration --auth-token $JWT
+...
+Operation:          Sync
+Sync Revision:      4842f40394df6b2a4a5f9af3caf28aff6c3efeae
+Phase:              Succeeded
+Start:              2023-03-15 13:46:43 +0100 CET
+Finished:           2023-03-15 13:46:44 +0100 CET
+Duration:           1s
+Message:            successfully synced (all tasks run)
+...
+```
+
+It is possible to explore the Argo CD *appproject* object in order to review JWT tokens linked with this project referenced by the ID and IAT. The following commands illustrate how is possible to obtain some information from this object and from the original token.
+
+- Obtain the JWT token asociated to a specific Argo CD *appproject*
+
+```$bash
+$ oc get appproject -n openshift-gitops integration -o yaml -o jsonpath='{.status}'
+{"jwtTokensByRole":{"argo-integration":{"items":[{"iat":1678889292,"id":"de96dc6a-ac35-4a9a-bf2c-93b1e5efc6dc"}]}}}
+```
+
+- Obtain the respective *iat* and *id* from the JWT
+
+```$bash
+$ echo $JWT | sed 's/\./\n/g' <<< $(cut -d. -f1,2 <<< $1) | base64 --decode | jq
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+{
+  "iss": "argocd",
+  "sub": "proj:integration:argo-integration",
+  "nbf": 1678889292,
+  "iat": 1678889292,
+  "jti": "de96dc6a-ac35-4a9a-bf2c-93b1e5efc6dc"
+}
+```
+
+
 - Modify the project file to add permissions to this JWT and apply the changes
 
 ```$bash
-$ vi files/applications/integration-project-ok.yaml
+$ vi files/applications/integration-project-jwt.yaml
 ...
     jwtTokens:
       - iat: 1678883856
 
-$ apply -f files/applications/integration-project-ok.yaml
+$ oc apply -f files/applications/integration-project-jwt.yaml
 ```
 
 - Test the current permissions of this JWT 
