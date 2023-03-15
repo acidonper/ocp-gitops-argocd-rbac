@@ -15,7 +15,7 @@ This solution is based on Argo CD and the following sections try to collect some
 First of all, it is required create the respective users, groups and resources following the next procedure:
 
 ```$bash
-sh files/setup_lab_multi.sh
+$ sh files/setup_lab_multi.sh
 ```
 
 After the command is finished, the Openshift cluster has the following configuration:
@@ -109,8 +109,6 @@ Regarding managing remote clusters, it is necessary to provide a cluster user cr
 - Create a namespace named integration and grant the specific permissions to the *apimanager01* user
 
 ```$bash
-$ oc login -u admin -p ****** https://api.acidonpe34.sandbox766.opentlc.com:6443
-
 $ oc new-project integration
 ```
 
