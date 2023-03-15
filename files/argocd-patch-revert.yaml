@@ -1,6 +1,0 @@
-spec: 
-  rbac:
-    defaultPolicy: ''
-    policy: |
-      g, system:cluster-admins, role:admin
-    scopes: '[groups]'

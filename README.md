@@ -232,6 +232,11 @@ FATA[0001] rpc error: code = PermissionDenied desc = cannot sync: blocked by syn
 > 
 > In the Argo CD web interface appears a specific section called *Sync Windows* that reflects the current state of this restriction
 
+## Interesting links
+
+* https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/
+* https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/
+* https://argo-cd.readthedocs.io/en/stable/user-guide/sync_windows/
 
 ## Author
 
