@@ -106,7 +106,7 @@ Regarding managing remote clusters, it is necessary to provide a cluster user cr
 > 
 > It is required to change the Openshift API hostname in every step
 
-- Create a namespace named integration
+- Create a namespace named integration (*This namespace will be managed as an external namespace using the public API Url*)
 
 ```$bash
 $ oc new-project integration
